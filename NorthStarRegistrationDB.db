@@ -1,0 +1,66 @@
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "Student" (
+	"StudentID"	TEXT NOT NULL,
+	"Name"	TEXT NOT NULL,
+	PRIMARY KEY("StudentID")
+);
+CREATE TABLE IF NOT EXISTS "Faculty" (
+	"FacultyID"	TEXT NOT NULL,
+	"Name"	TEXT NOT NULL,
+	PRIMARY KEY("FacultyID")
+);
+CREATE TABLE IF NOT EXISTS "Course" (
+	"CourseID"	TEXT NOT NULL,
+	"Name"	TEXT NOT NULL,
+	"Credits"	INTEGER NOT NULL,
+	PRIMARY KEY("CourseID")
+);
+CREATE TABLE IF NOT EXISTS "Section" (
+	"Course_SectionID"	TEXT NOT NULL,
+	"CourseID"	TEXT NOT NULL,
+	"FacultyID"	TEXT NOT NULL,
+	"SectionID"	INTEGER NOT NULL,
+	"Capacity"	INTEGER NOT NULL,
+	"Semester"	TEXT NOT NULL,
+	FOREIGN KEY("CourseID") REFERENCES "Course"("CourseID"),
+	FOREIGN KEY("FacultyID") REFERENCES "Faculty"("FacultyID"),
+	PRIMARY KEY("Course_SectionID")
+);
+CREATE TABLE IF NOT EXISTS "Enrollment" (
+	"EnrollmentID"	INTEGER NOT NULL,
+	"StudentID"	TEXT NOT NULL,
+	"Course_SectionID"	TEXT NOT NULL,
+	"Flag"	INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY("StudentID") REFERENCES "Student"("StudentID"),
+	FOREIGN KEY("Course_SectionID") REFERENCES "Section"("Course_SectionID"),
+	PRIMARY KEY("EnrollmentID")
+);
+INSERT INTO "Student" VALUES ('00210316','Al Hitchcock');
+INSERT INTO "Student" VALUES ('00005943','Buddy Holly');
+INSERT INTO "Student" VALUES ('00219735','Courteney Cox');
+INSERT INTO "Student" VALUES ('00001372','James Carrey');
+INSERT INTO "Faculty" VALUES ('01038059','Rick Pryor');
+INSERT INTO "Faculty" VALUES ('00234567','Bill Withers');
+INSERT INTO "Faculty" VALUES ('01045221','Jerry Garcia');
+INSERT INTO "Faculty" VALUES ('00340182','Dolly Parton');
+INSERT INTO "Course" VALUES ('COM-190','Performance and Improv',3);
+INSERT INTO "Course" VALUES ('COM-267','Intermediate Set-Ups',4);
+INSERT INTO "Course" VALUES ('COM-213','Intro to Impressions',2);
+INSERT INTO "Course" VALUES ('ART-281','History of Western Art',3);
+INSERT INTO "Course" VALUES ('MATH-200','Statistics',3);
+INSERT INTO "Section" VALUES ('COM213-001','COM-213','00234567',1,50,'Fall');
+INSERT INTO "Section" VALUES ('COM213-002','COM-213','00234567',2,40,'Fall');
+INSERT INTO "Section" VALUES ('COM213-003','COM-213','01038059',3,100,'Spring');
+INSERT INTO "Section" VALUES ('ART281-001','ART-281','00340182',1,25,'Fall');
+INSERT INTO "Section" VALUES ('MATH200-001','MATH-200','01045221',1,30,'Spring');
+INSERT INTO "Section" VALUES ('COM267-001','COM-267','00234567',1,100,'Summer');
+INSERT INTO "Section" VALUES ('COM267-002','COM-267','01045221',2,10,'Summer');
+INSERT INTO "Section" VALUES ('COM190-001','COM-190','00340182',1,20,'Fall');
+INSERT INTO "Enrollment" VALUES (20,'00210316','COM213-001',0);
+INSERT INTO "Enrollment" VALUES (21,'00001372','ART281-001',0);
+INSERT INTO "Enrollment" VALUES (22,'00210316','ART281-001',0);
+INSERT INTO "Enrollment" VALUES (23,'00005943','COM213-002',0);
+INSERT INTO "Enrollment" VALUES (24,'00001372','COM267-002',1);
+INSERT INTO "Enrollment" VALUES (25,'00005943','MATH200-001',3);
+INSERT INTO "Enrollment" VALUES (26,'00210316','COM190-001',1);
+COMMIT;
