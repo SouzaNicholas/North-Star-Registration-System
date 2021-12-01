@@ -3,9 +3,14 @@ import sqlite3 as sql
 
 class Student:
 
-    def __init__(self, ID: str, name: str):
-        self.ID = ID
-        self.name = name
+    def __init__(self, ID: str):
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        curs.execute("SELECT * FROM Student WHERE StudentID = (?)", [ID])
+        parameters = curs.fetchone()
+        self.ID = parameters[0]
+        self.name = parameters[1]
+        conn.close()
 
     # Adds this student to the database
     def add(self, cursor: sql.Cursor, conn: sql.Connection):
@@ -82,9 +87,14 @@ class Student:
 
 class Faculty:
 
-    def __init__(self, ID: str, name: str):
-        self.ID = ID
-        self.name = name
+    def __init__(self, ID: str):
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        curs.execute("SELECT * FROM Faculty WHERE FacultyID = (?)", [ID])
+        parameters = curs.fetchone()
+        self.ID = parameters[0]
+        self.name = parameters[1]
+        conn.close()
 
     # Adds the faculty record to the database.
     def add(self, cursor: sql.Cursor, conn: sql.Connection):
@@ -143,10 +153,18 @@ class Faculty:
 
 class Course:
 
-    def __init__(self, id: str, name: str, credits: int):
-        self.id = id
-        self.name = name
-        self.credits = credits
+    def __init__(self, ID: str):
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        curs.execute("SELECT * FROM Course WHERE CourseID = (?)", [ID])
+        parameters = curs.fetchone()
+        self.course_ID = parameters[0]
+        self.name = parameters[1]
+        self.credits = parameters[2]
+        conn.close()
+        # self.id = id
+        # self.name = name
+        # self.credits = credits
 
     def add(self, cursor: sql.Cursor, conn: sql.Connection):
         try:
@@ -172,14 +190,27 @@ class Course:
 # TODO: Check for misinputs. If type in wrong info on object creation says has been removed even tho there is no section
 class Section:
 
-    def __init__(self, course_section_ID: str, course_ID: str, faculty_ID: str, section_ID: int, capacity: int,
-                 semester: str):
-        self.course_section_ID = course_section_ID
-        self.course_ID = course_ID
-        self.faculty_ID = faculty_ID
-        self.section_ID = section_ID
-        self.capacity = capacity
-        self.semester = semester
+    def __init__(self, ID: str):
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        try:
+            curs.execute("SELECT * FROM Section WHERE Course_SectionID = (?)", [ID])
+        except Exception as e:
+            print("Could not fetch record")
+        parameters = curs.fetchone()
+        self.course_section_ID = parameters[0]
+        self.course_ID = parameters[1]
+        self.faculty_ID = parameters[2]
+        self.section_ID = parameters[3]
+        self.capacity = parameters[4]
+        self.semester = parameters[5]
+        conn.close()
+        # self.course_section_ID = course_section_ID
+        # self.course_ID = course_ID
+        # self.faculty_ID = faculty_ID
+        # self.section_ID = section_ID
+        # self.capacity = capacity
+        # self.semester = semester
 
     def add(self, cursor: sql.Cursor, conn: sql.Connection):
         try:
