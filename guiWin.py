@@ -7,6 +7,204 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, Q
 
 import pandas as pd
 
+# Course Section LookUp
+class SectionWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Course Section Lookup")
+
+        # SectionId
+        self.section_id_label = QLabel(self)
+        self.sectionId = QLineEdit(self)
+
+        # section Description
+
+        self.section_description_label = QLabel(self)
+        self.sectionDescription = QLineEdit(self)
+
+         # section
+        self.section_name_label = QLabel(self)
+        self.sectionName = QLineEdit(self)
+        # section credits
+        self.section_credits_label = QLabel(self)
+        self.sectionCredits = QLineEdit(self)
+
+        # section capacity
+        self.section_capacity_label = QLabel(self)
+        self.sectionCapacity = QLineEdit(self)
+
+        # section semester
+        self.section_semester_label = QLabel(self)
+        self.sectionSemester = QLineEdit(self)
+
+
+        # section Button
+        self.review = QPushButton(self)
+        self.remove_section = QPushButton(self)
+        self.print_semester = QPushButton(self)
+        self.done = QPushButton(self)
+        self.cancel = QPushButton(self)
+
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.setGeometry(20, 20, 600, 600)
+        # SectionId
+        self.section_id_label.setText("ID:")
+        self.section_id_label.resize(100, 30)
+        self.section_id_label.move(20, 10)
+        self.sectionId.resize(150, 20)
+        self.sectionId.move(100, 20)
+
+        # section Description
+        self.section_description_label.setText("Description:")
+        self.section_description_label.resize(100, 30)
+        self.section_description_label.move(20, 55)
+        self.sectionDescription.resize(150, 20)
+        self.sectionDescription.move(100, 60)
+
+        # section
+        self.section_name_label.setText("Section:")
+        self.section_name_label.resize(150, 30)
+        self.section_name_label.move(20, 95)
+        self.sectionName.resize(150, 20)
+        self.sectionName.move(100, 100)
+
+        # section Credits
+        self.section_credits_label.setText("Credits:")
+        self.section_credits_label.resize(150, 20)
+        self.section_credits_label.move(20, 150)
+        self.sectionCredits.resize(150, 20)
+        self.sectionCredits.move(100, 150)
+
+
+        # section Capacity
+        self.section_capacity_label.setText("Capacity:")
+        self.section_capacity_label.resize(150, 20)
+        self.section_capacity_label.move(20, 250)
+        self.sectionCapacity.resize(150, 20)
+        self.sectionCapacity.move(100, 250)
+
+        # section Semester
+        self.section_semester_label.setText("Semester:")
+        self.section_semester_label.resize(150, 20)
+        self.section_semester_label.move(20,300)
+        self.sectionSemester.resize(150, 20)
+        self.sectionSemester.move(100, 300)
+
+        # section review
+        self.review.setText("Review")
+        self.review.move(450, 250)
+        # section Remove
+        self.remove_section.setText("Remove section")
+        self.remove_section.resize(150, 30)
+        self.remove_section.move(20, 350)
+
+        # Print Semester Registration
+        self.print_semester.setText("Print Semester Registration")
+        self.print_semester.resize(300, 30)
+        self.print_semester.move(20, 500)
+
+        # student doneButton
+        self.done.setText("Done")
+        self.done.move(20, 550)
+        self.done.clicked.connect(self.done_exit)
+
+        # student cancelButton
+        self.cancel.setText("Cancel")
+        self.cancel.resize(100, 30)
+        self.cancel.move(450, 550)
+
+        # doneFunction
+    def done_exit(self):
+        choice = QMessageBox.question(self, 'Extract!', "Are you sure ?",
+                                      QMessageBox.Yes | QMessageBox.No)
+        if choice == QMessageBox.Yes:
+            print("Ok have a good day!")
+            sys.exit()
+        else:
+            pass
+
+# course Window
+class CourseWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Course Lookup")
+
+
+
+        #courseId
+        self.course_label=QLabel(self)
+        self.courseId = QLineEdit(self)
+
+       # courseDescription
+        self.course_description_label = QLabel(self)
+        self.courseDescription = QLineEdit(self)
+
+       # courseCredits
+        self.course_credits_label = QLabel(self)
+        self.courseCredits = QLineEdit(self)
+
+        # courseButton
+        self.remove_course= QPushButton(self)
+        self.done= QPushButton(self)
+        self.cancel= QPushButton(self)
+        self.print_semester = QPushButton(self)
+
+        self.setup_ui()
+    def setup_ui(self):
+        self.setGeometry(20, 20, 400, 400)
+         # courseId
+        self.course_label.setText("ID")
+        self.course_label.resize(100, 30)
+        self.course_label.move(20, 10)
+        self.courseId.resize(150,20)
+        self.courseId.move(100,20)
+
+       #course Description
+        self.course_description_label.setText("Description:")
+        self.course_description_label.resize(150, 30)
+        self.course_description_label.move(20, 45)
+        self.courseDescription.resize(150, 20)
+        self.courseDescription.move(100, 50)
+
+        self.course_credits_label.setText("Credits:")
+        self.course_credits_label.resize(100, 30)
+        self.course_credits_label.move(20, 95)
+        self.courseCredits.resize(150, 20)
+        self.courseCredits.move(100, 100)
+
+
+        # course RemoveCourseButton
+        self.remove_course.setText("Remove Course")
+        self.remove_course.resize(150,30)
+        self.remove_course.move(20,150)
+
+        #Print Registration
+
+        self.print_semester.setText("Print Semester Registration")
+        self.print_semester.resize(300, 30)
+        self.print_semester.move(20, 300)
+
+        # course doneButton
+        self.done.setText("Done")
+        self.done.move(20,350)
+        self.done.clicked.connect(self.done_exit)
+
+        # course cancelButton
+        self.cancel.setText("Cancel")
+        self.cancel.resize(100,30)
+        self.cancel.move(270, 350)
+
+  # doneFunction
+    def done_exit(self):
+            choice = QMessageBox.question(self, 'Extract!', "Are you sure ?",
+                                          QMessageBox.Yes | QMessageBox.No)
+            if choice == QMessageBox.Yes:
+                print("Ok have a good day!")
+                sys.exit()
+            else:
+                pass
 # StudentWindow
 class StudentWindow(QMainWindow):
     def __init__(self):
@@ -268,7 +466,7 @@ class Window(QMainWindow):
 
     def setup_ui(self):
         self.setWindowTitle("Main Database Window")
-        self.setGeometry(30, 30, 500, 500)
+        self.setGeometry(40, 40, 700, 700)
 
         # student Id field
         self.studentID_Label.setText("            Enter ID:")
@@ -307,7 +505,7 @@ class Window(QMainWindow):
         self.box.addItem("Course")
         self.box.addItem("Faculty")
         self.box.addItem("Section")
-        self.box.activated[str].connect(self.StudentWindow)
+        self.box.activated[str].connect(self.SectionWindow)
 
         # show on the display
         self.show()
@@ -327,6 +525,15 @@ class Window(QMainWindow):
         self.open_new_window=StudentWindow()
         self.open_new_window.show()
 
+    # courseWindow
+    def CourseWindow(self):
+        self.open_new_window= CourseWindow()
+        self.open_new_window.show()
+
+
+    def SectionWindow(self):
+        self.open_new_window = SectionWindow()
+        self.open_new_window.show()
         # done function
     def done_exit(self):
         choice = QMessageBox.question(self, 'Extract!', "Are you sure ?",
