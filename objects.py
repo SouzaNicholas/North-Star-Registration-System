@@ -39,7 +39,7 @@ class Student:
         conn.commit()
 
     # Creates an enrollment record linking this student to the provided seciton record
-    def add_course(self, course_section_ID:str, cursor: sql.Cursor, conn: sql.Connection):
+    def add_course(self, course_section_ID: str, cursor: sql.Cursor, conn: sql.Connection):
         try:
             cursor.execute("""INSERT INTO Enrollment (StudentID, Course_SectionID, Flag) VALUES (?, ?, ?)""",
                            (self.ID, course_section_ID, 0))  # Passes nothing to EnrollmentID, as it's auto incremented
@@ -56,12 +56,28 @@ class Student:
             print("Could not remove course")
         conn.commit()
 
-    # TODO: This requires a complicated series of SQL calls that I will return to. -NS
-    def check_flags(self, cursor: sql.Cursor, conn: sql.Connection) -> bool:
-        # SQL call to find credit value of student's courses
-        cursor.execute("""""")
-        #return total > limit
-        return False
+    def check_flags(self, cursor: sql.Cursor) -> bool:
+        credits = 0
+        cursor.execute("""SELECT Course.Credits FROM Course JOIN Section, Enrollment, Student 
+                        WHERE Course.CourseID = Section.CourseID
+                        AND Section.Course_SectionID = Enrollment.Course_SectionID
+                        AND Student.StudentID = Enrollment.StudentID
+                        AND Enrollment.StudentID = (?)""", [self.ID])
+        for i in cursor.fetchall():
+            credits += i[0]
+
+        if credits > 12:
+            return True
+        else:
+            return False
+
+    def print_registration(self, cursor: sql.Cursor):
+        cursor.execute("""SELECT Section.Course_SectionID, Course.Name, Course.Credits FROM Course JOIN Section, Student, Enrollment
+                        WHERE Section.Course_SectionID = Enrollment.Course_SectionID
+                        AND Course.CourseID = Section.CourseID
+                        AND Student.StudentID = Enrollment.StudentID
+                        AND Student.StudentID = (?)""", [self.ID])
+        return cursor.fetchall()
 
 
 class Faculty:
@@ -104,8 +120,7 @@ class Faculty:
         conn.commit()
 
     # Changes the listed faculty ID on the provided Section record.
-    # TODO: This method is currently able to insert IDs of faculty members that do not exist. Will fix. -NS
-    def add_course(self, course_section_ID:str, cursor: sql.Cursor, conn: sql.Connection):
+    def add_course(self, course_section_ID: str, cursor: sql.Cursor, conn: sql.Connection):
         try:
             cursor.execute("""UPDATE Section SET FacultyID=(?) WHERE Course_SectionID=(?)""",
                            (self.ID, course_section_ID))
@@ -114,12 +129,15 @@ class Faculty:
             print("Failed to add faculty to course for:", self.ID)
         conn.commit()
 
-    def remove_course(self, ID: str, courseID: str, cursor: sql.Cursor, conn: sql.Connection):
-        # This method may need to be removed. To remove faculty from a course section,
-        # FacultyID in that section would have to be changed. The only way to do that is
-        # by setting it to null or inserting a new Faculty ID. Since FacultyID is
-        # non-nullable and it doesn't make sense to pass in the ID of a different
-        # faculty member, I think the safest bet is to cut this. -NS
+    # Removes a faculty member from a course by changing the listed instructor
+    # to a default "No Faculty" entry.
+    def remove_course(self, course_section_ID: str, cursor: sql.Cursor, conn: sql.Connection):
+        try:
+            cursor.execute("""UPDATE Section SET FacultyID=(?) WHERE Course_SectionID=(?)""",
+                           ("00000000", course_section_ID))
+        except Exception as e:
+            # Display message in GUI along the lines of "Unexpected error occured. Try again."
+            print("Failed to remove faculty from course for:", self.ID)
         conn.commit()
 
 
@@ -128,7 +146,7 @@ class Course:
     def __init__(self, id: str, name: str, credits: int):
         self.id = id
         self.name = name
-        self.credits = int
+        self.credits = credits
 
     def add(self, cursor: sql.Cursor, conn: sql.Connection):
         try:
@@ -138,12 +156,16 @@ class Course:
             print("failed to add course to 'Course'")
         conn.commit()
 
-    # TODO: is course safe to delete? Check section, student, or faculty first? -BG
+    # checks if sections still exist, if not then safe to delete. -BG
     def remove(self, cursor: sql.Cursor, conn: sql.Connection):
-        try:
-            cursor.execute("""DELETE FROM Course WHERE CourseID=(?);""", (self.id,))
-        except Exception as e:
-            print("failed to remove course from 'Course'")
+        cursor.execute("""SELECT * FROM Section WHERE CourseID=(?)""", [self.id])
+        if len(cursor.fetchall()) < 1:
+            try:
+                cursor.execute("""DELETE FROM Course WHERE CourseID=(?);""", (self.id,))
+            except Exception as e:
+                print("failed to remove course from 'Course'")
+        else:
+            print("Could not delete course. Try removing associated sections first.")
         conn.commit()
 
 
@@ -167,9 +189,16 @@ class Section:
             print("failed to add section to 'Section'")
         conn.commit()
 
-    # TODO:
     def remove(self, cursor: sql.Cursor, conn: sql.Connection):
-        pass
+        cursor.execute("""SELECT * FROM Enrollment WHERE Course_SectionID=(?)""", [self.course_section_ID])
+        if len(cursor.fetchall()) < 1:
+            try:
+                cursor.execute("""DELETE FROM Section WHERE Course_SectionID=(?);""", (self.course_section_ID,))
+            except Exception as e:
+                print("failed to remove Section")
+        else:
+            print("Could not delete Section.")
+        conn.commit()
 
     # TODO:
     def check_flags(self, cursor: sql.Cursor, conn: sql.Connection) -> bool:
