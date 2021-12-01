@@ -505,6 +505,11 @@ class MainWindow(QMainWindow):
         else:
             self.id_error.exec()
 
+    # OnClick method for the lookup button
+    # Pulls record type from the dropdown, then creates
+    # the corresponding type of record by pulling its
+    # ID from the ID entry. That record is then passed
+    # to a new lookup menu object.
     def build_lookup(self):
         record_type = self.box.currentText()
         record = None
@@ -519,6 +524,11 @@ class MainWindow(QMainWindow):
         self.lookup = LookupWindow(record)
         self.lookup.show()
 
+    # Checks the record type specified by the dropdown.
+    # For student and faculty, it will create an object
+    # of that type and call its add method to add it to
+    # the database. For course and section, it will create
+    # a course add window to capture more fields.
     def add_record(self):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
