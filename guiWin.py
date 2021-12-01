@@ -505,6 +505,7 @@ class MainWindow(QMainWindow):
             self.cursor.execute(query)
             fence = pd.DataFrame.from_records(self.cursor.fetchall())
             print(fence)
+            print("")
         else:
             self.id_error.exec()
 
