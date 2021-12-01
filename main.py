@@ -1,5 +1,4 @@
 import guiWin
-
 import sys
 
 import sqlite3 as sql
@@ -13,9 +12,7 @@ def main():
 
     app = guiWin.QApplication(sys.argv)
 
-    ex = guiWin.Window(conn, cursor)
-
-   # window = guiWin.Window()
+    ex = guiWin.MainWindow(conn, cursor)
 
     ex.isHidden()
 

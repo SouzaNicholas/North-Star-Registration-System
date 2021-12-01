@@ -3,13 +3,22 @@ import sqlite3 as sql
 
 class Student:
 
-    def __init__(self, ID: str):
+    def __init__(self, parameters: list[str]):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
-        curs.execute("SELECT * FROM Student WHERE StudentID = (?)", [ID])
-        parameters = curs.fetchone()
-        self.ID = parameters[0]
-        self.name = parameters[1]
+        curs.execute("SELECT * FROM Student WHERE StudentID = (?)", [parameters[0]])
+        record = curs.fetchone()
+
+        # Checks to see if the query returned anything.
+        # If not, we assume this is a new record.
+        # Therefore, the parameters passed in must have the
+        # rest of the information a new record would need
+        if type(record) is not None:
+            self.ID = record[0]
+            self.name = record[1]
+        else:
+            self.ID = parameters[0]
+            self.name = parameters[1]
         conn.close()
 
     # Adds this student to the database
@@ -87,13 +96,25 @@ class Student:
 
 class Faculty:
 
-    def __init__(self, ID: str):
+    def __init__(self, parameters: list[str]):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
-        curs.execute("SELECT * FROM Faculty WHERE FacultyID = (?)", [ID])
-        parameters = curs.fetchone()
-        self.ID = parameters[0]
-        self.name = parameters[1]
+        try:
+            curs.execute("SELECT * FROM Faculty WHERE FacultyID = (?)", parameters[0])
+        except Exception as e:
+            print("Could not fetch record")
+        record = curs.fetchone()
+
+        # Checks to see if the query returned anything.
+        # If not, we assume this is a new record.
+        # Therefore, the parameters passed in must have the
+        # rest of the information a new record would need
+        if type(record) is not None:
+            self.ID = record[0]
+            self.name = record[1]
+        else:
+            self.ID = parameters[0]
+            self.name = parameters[1]
         conn.close()
 
     # Adds the faculty record to the database.
@@ -153,14 +174,27 @@ class Faculty:
 
 class Course:
 
-    def __init__(self, ID: str):
+    def __init__(self, parameters: list[str]):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
-        curs.execute("SELECT * FROM Course WHERE CourseID = (?)", [ID])
-        parameters = curs.fetchone()
-        self.course_ID = parameters[0]
-        self.name = parameters[1]
-        self.credits = parameters[2]
+        try:
+            curs.execute("SELECT * FROM Course WHERE CourseID = (?)", parameters[0])
+        except Exception as e:
+            print("Could not fetch record")
+        record = curs.fetchone()
+
+        # Checks to see if the query returned anything.
+        # If not, we assume this is a new record.
+        # Therefore, the parameters passed in must have the
+        # rest of the information a new record would need
+        if type(record) is not None:
+            self.course_ID = record[0]
+            self.name = record[1]
+            self.credits = record[2]
+        else:
+            self.course_ID = parameters[0]
+            self.name = parameters[1]
+            self.credits = parameters[2]
         conn.close()
         # self.id = id
         # self.name = name
@@ -190,20 +224,33 @@ class Course:
 # TODO: Check for misinputs. If type in wrong info on object creation says has been removed even tho there is no section
 class Section:
 
-    def __init__(self, ID: str):
+    def __init__(self, parameters: list[str]):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
         try:
-            curs.execute("SELECT * FROM Section WHERE Course_SectionID = (?)", [ID])
+            curs.execute("SELECT * FROM Section WHERE Course_SectionID = (?)", parameters[0])
         except Exception as e:
             print("Could not fetch record")
-        parameters = curs.fetchone()
-        self.course_section_ID = parameters[0]
-        self.course_ID = parameters[1]
-        self.faculty_ID = parameters[2]
-        self.section_ID = parameters[3]
-        self.capacity = parameters[4]
-        self.semester = parameters[5]
+        record = curs.fetchone()
+
+        # Checks to see if the query returned anything.
+        # If not, we assume this is a new record.
+        # Therefore, the parameters passed in must have the
+        # rest of the information a new record would need
+        if type(record) is not None:
+            self.course_section_ID = record[0]
+            self.course_ID = record[1]
+            self.faculty_ID = record[2]
+            self.section_ID = record[3]
+            self.capacity = record[4]
+            self.semester = record[5]
+        else:
+            self.course_section_ID = parameters[0]
+            self.course_ID = parameters[1]
+            self.faculty_ID = parameters[2]
+            self.section_ID = parameters[3]
+            self.capacity = parameters[4]
+            self.semester = parameters[5]
         conn.close()
         # self.course_section_ID = course_section_ID
         # self.course_ID = course_ID

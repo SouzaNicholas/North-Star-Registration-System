@@ -37,7 +37,10 @@ class CourseAddWindow(QMainWindow):
     def setup_ui(self):
         self.setGeometry(500, 500)
 
-        self.id_label.resize()
+        self.id_label.resize(100, 30)
+        self.id_label.move(20, 10)
+        self.id_field.resize(150, 20)
+        self.id_field.move(75, 20)
 
 class LookupWindow(QMainWindow):
     def __init__(self, record):
@@ -274,7 +277,7 @@ class LookupWindow(QMainWindow):
         self.cancel.move(270, 350)
 
     def setup_section_ui(self):
-        course = obj.Course(self.record.course_ID)
+        course = obj.Course([self.record.course_ID])
         self.setWindowTitle("Course Section Lookup")
 
         # SectionId
@@ -514,13 +517,13 @@ class MainWindow(QMainWindow):
         record_type = self.box.currentText()
         record = None
         if record_type == "Student":
-            record = obj.Student(self.studentID.text())
+            record = obj.Student([self.studentID.text(), self.studentName.text()])
         elif record_type == "Faculty":
-            record = obj.Faculty(self.studentID.text())
+            record = obj.Faculty([self.studentID.text(), self.studentName.text()])
         elif record_type == "Course":
-            record = obj.Course(self.studentID.text())
+            record = obj.Course([self.studentID.text(), self.studentName.text()])
         elif record_type == "Section":
-            record = obj.Section(self.studentID.text())
+            record = obj.Section([self.studentID.text(), self.studentName.text()])
         self.lookup = LookupWindow(record)
         self.lookup.show()
 
@@ -533,15 +536,15 @@ class MainWindow(QMainWindow):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
         if self.box.currentText() == "Student":
-            s = obj.Student(self.studentID.text())
+            s = obj.Student([self.studentID.text(), self.studentName.text()])
             s.add(curs, conn)
         elif self.box.currentText() == "Faculty":
-            f = obj.Faculty(self.studentID.text())
+            f = obj.Faculty([self.studentID.text(), self.studentName.text()])
             f.add(curs, conn)
         elif self.box.currentText() == "Course" or self.box.currentText() == "Section":
             course_add = CourseAddWindow()
             course_add.show()
             while course_add.isVisible():
-                course_add.show()  # Could be disastrous, be wary
+                print(1)
         conn.close()
 
