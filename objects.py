@@ -169,6 +169,7 @@ class Course:
         conn.commit()
 
 
+# TODO: Check for misinputs. If type in wrong info on object creation says has been removed even tho there is no section
 class Section:
 
     def __init__(self, course_section_ID: str, course_ID: str, faculty_ID: str, section_ID: int, capacity: int,
@@ -202,12 +203,28 @@ class Section:
 
     # TODO:
     def check_flags(self, cursor: sql.Cursor, conn: sql.Connection) -> bool:
-        print("check_flags")
-        return False
+        capacity = 0
+        # find total capacity
+        cursor.execute("""""")
 
+        # check course section max capacity
+        cursor.execute("""SELECT * FROM Section WHERE Course_SectionID='(?)'""", (self.course_section_ID,))
+        fetch = cursor.fetchone()
+        # print(fetch)
+        step = 0
+        for i in fetch:
+            step += 1
+            if step == 5:
+                # print(i)
+                max_capacity = i
+        if capacity > max_capacity:
+            return True
+        else:
+            return False
+
+    # TODO:
     def print_class_list(self, cursor: sql.Cursor, conn: sql.Connection):
         try:
-            print("print_class_list")
             # get studentID from enrollment if course_sectionID matches
             cursor.execute("""SELECT * Enrollment WHERE course_sectionID='(?)'""", (self.course_section_ID,))
             # get name of students with id from 'Student' -BG
