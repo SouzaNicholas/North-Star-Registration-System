@@ -8,6 +8,69 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, Q
 
 import pandas as pd
 
+class ReviewWindow(QMainWindow):
+    def __init__(self,record):
+        super().__init__()
+        self.setWindowTitle("Registration Info")
+        self.setGeometry(30,30,400,400)
+
+
+       # setting Id label
+
+
+
+        # Remove Flag Button
+        self.removeflag = QPushButton(self)
+        self.removeflag.setText("Remove Flag")
+        self.removeflag.resize(120, 30)
+        self.removeflag.move(10, 350)
+
+        # Remove Course Button
+        self.removecourse = QPushButton(self)
+        self.removecourse.setText("Remove Course")
+        self.removecourse.resize(120,30)
+        self.removecourse.move(130,350)
+
+        # Cancel Button
+        self.cancel = QPushButton(self)
+        self.cancel.setText("Cancel")
+        self.cancel.resize(120,30)
+        self.cancel.move(257,350)
+
+
+class ModifyWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Modify window")
+        self.setGeometry(20, 20, 300, 300)
+
+         # modify label
+        self.id_modify_label = QLabel(self)
+        self.id_modify_label.setText("ID")
+        self.id_modify_label.move(20, 30)
+
+        # modify label
+        self.name_modify_label = QLabel(self)
+        self.name_modify_label.setText("Name")
+        self.name_modify_label.move(20, 100)
+
+        # modify text Field
+        self.modifyId = QLineEdit(self)
+        self.modifyId.move(70, 30)
+        self.modifyName = QLineEdit(self)
+        self.modifyName.move(70, 100)
+
+        #Uptdate_Button
+        self.update_button= QPushButton(self)
+        self.update_button.setText("Update")
+        self.update_button.resize(100, 30)
+        self.update_button.move(20, 250)
+
+        #Done_Button
+        self.done_button = QPushButton(self)
+        self.done_button.setText("Done")
+        self.done_button.resize(70,30)
+        self.done_button.move(230,250)
 
 class CourseAddWindow(QMainWindow):
     def __init__(self):
@@ -32,15 +95,13 @@ class CourseAddWindow(QMainWindow):
         self.semester_label = QLabel(self)
         self.semester_field = QLineEdit(self)
 
+
         self.setup_ui()
 
     def setup_ui(self):
         self.setGeometry(500, 500)
 
-        self.id_label.resize(100, 30)
-        self.id_label.move(20, 10)
-        self.id_field.resize(150, 20)
-        self.id_field.move(75, 20)
+        self.id_label.resize()
 
 class LookupWindow(QMainWindow):
     def __init__(self, record):
@@ -75,6 +136,7 @@ class LookupWindow(QMainWindow):
         # studentButton
         self.add_course = QPushButton(self)
         self.review = QPushButton(self)
+        self.review.clicked.connect(self.reviewWindow)
         self.remove_course = QPushButton(self)
         self.remove_student = QPushButton(self)
         self.modify_student = QPushButton(self)
@@ -112,7 +174,6 @@ class LookupWindow(QMainWindow):
         self.studentCredits.resize(150,20)
         self.studentCredits.move(75,150)
 
-
         # student AddButton
         self.add_course.setText("Add Course")
         self.add_course.move(20, 200)
@@ -128,6 +189,11 @@ class LookupWindow(QMainWindow):
         self.modify_student.setText("Modify Student")
         self.modify_student.resize(150, 30)
         self.modify_student.move(20,300)
+        self.modify_student.clicked.connect(self.modifyWindow)
+
+        # after clicking modify button
+
+
 
 
         # student Remove Student Button
@@ -152,6 +218,11 @@ class LookupWindow(QMainWindow):
         self.cancel.resize(100, 30)
         self.cancel.move(270, 450)
 
+        # Review Window
+    def reviewWindow(self):
+            self.open_newWindow = ReviewWindow(self.record)
+            self.open_newWindow.show()
+
     def setup_faculty_ui(self):
         self.setWindowTitle("Faculty Lookup")
 
@@ -168,6 +239,7 @@ class LookupWindow(QMainWindow):
         self.remove_faculty = QPushButton(self)
         self.done = QPushButton(self)
         self.cancel = QPushButton(self)
+        self.modify_Faculty= QPushButton(self)
 
         self.setGeometry(20, 20, 500, 500)
          # facultyId
@@ -195,10 +267,16 @@ class LookupWindow(QMainWindow):
         self.remove_course.resize(150,30)
         self.remove_course.move(20,150)
 
-        # faculty RemoveEmployeeButton
+        # faculty RemoveFacultyButton
         self.remove_faculty.setText("Remove Faculty")
         self.remove_faculty.resize(150,30)
         self.remove_faculty.move(20,200)
+
+        # modify Faculty_Button
+        self.modify_Faculty.setText("Modify Faculty")
+        self.modify_Faculty.resize(150,30)
+        self.modify_Faculty.move(20,300)
+        self.modify_Faculty.clicked.connect(self.modifyWindow)
 
         # faculty doneButton
         self.done.setText("Done")
@@ -209,6 +287,13 @@ class LookupWindow(QMainWindow):
         self.cancel.setText("Cancel")
         self.cancel.resize(100,30)
         self.cancel.move(270, 350)
+
+     #modify Window
+    def modifyWindow(self):
+            self.open_newWindow = ModifyWindow()
+            self.open_newWindow.show()
+
+
 
     def setup_course_ui(self):
         self.setWindowTitle("Course Lookup")
@@ -277,7 +362,7 @@ class LookupWindow(QMainWindow):
         self.cancel.move(270, 350)
 
     def setup_section_ui(self):
-        course = obj.Course([self.record.course_ID])
+        course = obj.Course(self.record.course_ID)
         self.setWindowTitle("Course Section Lookup")
 
         # SectionId
@@ -390,7 +475,8 @@ class LookupWindow(QMainWindow):
         choice = QMessageBox.question(self, 'Extract!', "Are you sure ?",
                                       QMessageBox.Yes | QMessageBox.No)
         if choice == QMessageBox.Yes:
-            self.close()
+            print("Ok have a good day!")
+            sys.exit()
         else:
             pass
 
@@ -480,7 +566,7 @@ class MainWindow(QMainWindow):
                               QMessageBox.Yes | QMessageBox.No)
         if choice == QMessageBox.Yes:
          print("Ok have a good day!")
-         self.close()
+         sys.exit()
         else:
             pass
 
@@ -493,10 +579,7 @@ class MainWindow(QMainWindow):
         # this method will check if the studentID exist and it will return a boolean value either 0 or one
         query = f"""SELECT EXISTS(SELECT 1 FROM Enrollment WHERE studentID ='{studentID}')"""
         flag = self.cursor.execute(query).fetchall()[0][0]
-        if flag == 1:  # this line will check if the student is there it will print the information
-            # print(studentID) Here I am missing the student name and course description because we did not specify
-            # it in our database table The student database table only have name instead of the student name and same
-            # with the course table
+        if flag == 1:
             query = f"""SELECT Enrollment.studentID, S.Name, c.Name, sectionID, flag FROM
                    Enrollment INNER JOIN Student S on S.studentID = Enrollment.studentID
                    INNER JOIN Section sec on sec.sectionID= sectionID
@@ -512,6 +595,8 @@ class MainWindow(QMainWindow):
     # the corresponding type of record by pulling its
     # ID from the ID entry. That record is then passed
     # to a new lookup menu object.
+
+
     def build_lookup(self):
         record_type = self.box.currentText()
         record = None
@@ -526,11 +611,13 @@ class MainWindow(QMainWindow):
         self.lookup = LookupWindow(record)
         self.lookup.show()
 
-    # Checks the record type specified by the dropdown.
-    # For student and faculty, it will create an object
-    # of that type and call its add method to add it to
-    # the database. For course and section, it will create
-    # a course add window to capture more fields.
+        # Checks the record type specified by the dropdown.
+        # For student and faculty, it will create an object
+        # of that type and call its add method to add it to
+        # the database. For course and section, it will create
+        # a course add window to capture more fields.
+
+
     def add_record(self):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
@@ -546,4 +633,13 @@ class MainWindow(QMainWindow):
             while course_add.isVisible():
                 print(1)
         conn.close()
+
+
+
+
+
+
+
+
+
 
