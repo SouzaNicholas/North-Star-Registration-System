@@ -203,17 +203,18 @@ class Course:
     def add(self, cursor: sql.Cursor, conn: sql.Connection):
         try:
             cursor.execute("""INSERT INTO Course (CourseID, Name, Credits) VALUES (?, ?, ?);""",
-                           (self.id, self.name, self.credits))
+                           (self.course_ID, self.name, self.credits))
         except Exception as e:
             print("failed to add course to 'Course'")
         conn.commit()
 
     # checks if sections still exist, if not then safe to delete. -BG
     def remove(self, cursor: sql.Cursor, conn: sql.Connection):
-        cursor.execute("""SELECT * FROM Section WHERE CourseID=(?)""", [self.id])
+        cursor.execute("""SELECT * FROM Section WHERE CourseID=(?)""", [self.course_ID])
+        # if there are no sections of the course:
         if len(cursor.fetchall()) < 1:
             try:
-                cursor.execute("""DELETE FROM Course WHERE CourseID=(?);""", (self.id,))
+                cursor.execute("""DELETE FROM Course WHERE CourseID=(?);""", (self.course_ID,))
             except Exception as e:
                 print("failed to remove course from 'Course'")
         else:
@@ -221,7 +222,6 @@ class Course:
         conn.commit()
 
 
-# TODO: Check for misinputs. If type in wrong info on object creation says has been removed even tho there is no section
 class Section:
 
     def __init__(self, parameters: list[str]):
@@ -270,6 +270,7 @@ class Section:
 
     def remove(self, cursor: sql.Cursor, conn: sql.Connection):
         cursor.execute("""SELECT * FROM Enrollment WHERE Course_SectionID=(?)""", [self.course_section_ID])
+        # if there are no course sections in enrollment:
         if len(cursor.fetchall()) < 1:
             try:
                 cursor.execute("""DELETE FROM Section WHERE Course_SectionID=(?);""", (self.course_section_ID,))
@@ -279,37 +280,32 @@ class Section:
             print("Could not delete Section.")
         conn.commit()
 
-    # TODO:
     def check_flags(self, cursor: sql.Cursor, conn: sql.Connection) -> bool:
-        capacity = 0
-        # find total capacity
-        cursor.execute("""""")
-
-        # check course section max capacity
-        cursor.execute("""SELECT * FROM Section WHERE Course_SectionID='(?)'""", (self.course_section_ID,))
-        fetch = cursor.fetchone()
-        # print(fetch)
-        step = 0
-        for i in fetch:
-            step += 1
-            if step == 5:
-                # print(i)
-                max_capacity = i
+        # SELECT * FROM Enrollment WHERE Course_SectionID='ART281-001'
+        cursor.execute("""SELECT * FROM Enrollment WHERE Course_SectionID=(?)""", (self.course_section_ID,))
+        # enrolled = number of students taking the course section
+        enrolled = cursor.fetchall()
+        # SELECT * FROM Section WHERE Course_SectionID='ART281-001'
+        cursor.execute("""SELECT * FROM Section WHERE Course_SectionID=(?)""", (self.course_section_ID,))
+        # Capacity_check = used to find max_capacity in a section
+        capacity_check = cursor.fetchall()
+        # inc = incrementer
+        inc = 0
+        for i in capacity_check:
+            for j in i:
+                inc += 1
+                # finds capacity column
+                if inc == 5:
+                    max_capacity = j
+        capacity = len(enrolled)
         if capacity > max_capacity:
             return True
         else:
             return False
 
-    # TODO:
     def print_class_list(self, cursor: sql.Cursor, conn: sql.Connection):
-        try:
-            # get studentID from enrollment if course_sectionID matches
-            cursor.execute("""SELECT * Enrollment WHERE course_sectionID='(?)'""", (self.course_section_ID,))
-            # get name of students with id from 'Student' -BG
-            id_list = cursor.fetchall()
-            for i in id_list:
-                cursor.execute("""SELECT * Student WHERE StudentID='(?)'""", (i,))
-                print(cursor.fetchone())
-        except Exception as e:
-            print("failed to print class list")
-        conn.commit()
+        # get studentID from enrollment if course_sectionID matches
+        cursor.execute("""SELECT Enrollment.StudentID, Student.Name FROM Enrollment JOIN Student WHERE 
+                              Student.StudentID = Enrollment.StudentID AND Enrollment.Course_SectionID = (?)""",
+                       (self.course_section_ID,))
+        return cursor.fetchall()
