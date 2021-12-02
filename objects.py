@@ -2,7 +2,6 @@ import sqlite3 as sql
 
 
 class Student:
-
     def __init__(self, parameters: list[str]):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
@@ -19,6 +18,7 @@ class Student:
         else:
             self.ID = parameters[0]
             self.name = parameters[1]
+        self.credits = self.credits(curs)
         conn.close()
 
     # Adds this student to the database
@@ -52,11 +52,17 @@ class Student:
             print("failed to modify student")
         conn.commit()
 
-    # Creates an enrollment record linking this student to the provided seciton record
+    # Creates an enrollment record linking this student to the provided section record
+
     def add_course(self, course_section_ID: str, cursor: sql.Cursor, conn: sql.Connection):
+        flag = 0  # default value of flag is 0, indicating no issue.
         try:
             cursor.execute("""INSERT INTO Enrollment (StudentID, Course_SectionID, Flag) VALUES (?, ?, ?)""",
                            (self.ID, course_section_ID, 0))  # Passes nothing to EnrollmentID, as it's auto incremented
+            if self.check_flags(cursor):
+                flag = 1
+                cursor.execute("""UPDATE Enrollment SET Flag = (?) WHERE StudentID = (?)
+                                AND Course_SectionID = (?)""", (flag, self.ID, course_section_ID))
         except Exception as e:
             print("Could not add course")
         conn.commit()
@@ -70,17 +76,19 @@ class Student:
             print("Could not remove course")
         conn.commit()
 
-    def check_flags(self, cursor: sql.Cursor) -> bool:
-        credits = 0
+    def credits(self, cursor: sql.Cursor) -> int:
+        cred = 0
         cursor.execute("""SELECT Course.Credits FROM Course JOIN Section, Enrollment, Student 
-                        WHERE Course.CourseID = Section.CourseID
-                        AND Section.Course_SectionID = Enrollment.Course_SectionID
-                        AND Student.StudentID = Enrollment.StudentID
-                        AND Enrollment.StudentID = (?)""", [self.ID])
+                                WHERE Course.CourseID = Section.CourseID
+                                AND Section.Course_SectionID = Enrollment.Course_SectionID
+                                AND Student.StudentID = Enrollment.StudentID
+                                AND Enrollment.StudentID = (?)""", [self.ID])
         for i in cursor.fetchall():
-            credits += i[0]
+            cred += i[0]
+        return cred
 
-        if credits > 12:
+    def check_flags(self, cursor: sql.Cursor) -> bool:
+        if self.credits(cursor) > 12:
             return True
         else:
             return False
@@ -95,12 +103,11 @@ class Student:
 
 
 class Faculty:
-
     def __init__(self, parameters: list[str]):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
         try:
-            curs.execute("SELECT * FROM Faculty WHERE FacultyID = (?)", parameters[0])
+            curs.execute("""SELECT * FROM Faculty WHERE FacultyID = (?)""", [parameters[0]])
         except Exception as e:
             print("Could not fetch record")
         record = curs.fetchone()
@@ -173,12 +180,11 @@ class Faculty:
 
 
 class Course:
-
     def __init__(self, parameters: list[str]):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
         try:
-            curs.execute("SELECT * FROM Course WHERE CourseID = (?)", parameters[0])
+            curs.execute("""SELECT * FROM Course WHERE CourseID = (?)""", [parameters[0]])
         except Exception as e:
             print("Could not fetch record")
         record = curs.fetchone()
@@ -223,12 +229,11 @@ class Course:
 
 
 class Section:
-
     def __init__(self, parameters: list[str]):
         conn = sql.connect("NorthStarRegistrationDB.db")
         curs = conn.cursor()
         try:
-            curs.execute("SELECT * FROM Section WHERE Course_SectionID = (?)", parameters[0])
+            curs.execute("""SELECT * FROM Section WHERE Course_SectionID = (?)""", [parameters[0]])
         except Exception as e:
             print("Could not fetch record")
         record = curs.fetchone()

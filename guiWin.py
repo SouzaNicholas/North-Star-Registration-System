@@ -246,6 +246,7 @@ class LookupWindow(QMainWindow):
         self.student_credits_label.setText("Credits:")
         self.student_credits_label.resize(150,20)
         self.student_credits_label.move(20,150)
+        self.studentCredits.setText(str(self.record.credits))
         self.studentCredits.resize(150,20)
         self.studentCredits.move(75,150)
 
