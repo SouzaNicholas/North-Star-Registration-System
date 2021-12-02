@@ -334,7 +334,6 @@ class LookupWindow(QMainWindow):
         self.studentCredits.resize(150,20)
         self.studentCredits.move(75,150)
 
-
         # student AddButton
         self.add_course.setText("Add Course")
         self.add_course.move(20, 200)
@@ -461,7 +460,7 @@ class LookupWindow(QMainWindow):
 
      #modify Window
     def modifyWindow(self):
-            self.open_newWindow = ModifyWindow(self)
+            self.open_newWindow = ModifyWindow()
             self.open_newWindow.show()
 
 
@@ -535,7 +534,7 @@ class LookupWindow(QMainWindow):
 
 
     def setup_section_ui(self):
-        course = obj.Course(self.record.course_ID)
+        course = obj.Course([self.record.course_ID])
         self.setWindowTitle("Course Section Lookup")
 
         # SectionId
@@ -649,8 +648,7 @@ class LookupWindow(QMainWindow):
         choice = QMessageBox.question(self, 'Extract!', "Are you sure ?",
                                       QMessageBox.Yes | QMessageBox.No)
         if choice == QMessageBox.Yes:
-            print("Ok have a good day!")
-            sys.exit()
+            self.close()
         else:
             pass
 
