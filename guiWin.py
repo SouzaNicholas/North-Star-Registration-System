@@ -14,7 +14,7 @@ class facWindow(QMainWindow):
         self.setWindowTitle("Add Course")
 
         self.record = record
-        self.setGeometry(20, 20, 200, 200)
+        self.setGeometry(20, 20, 300, 230)
 
 
         #Adds Faculty ID Label
@@ -50,6 +50,19 @@ class facWindow(QMainWindow):
         #Input Section Input
         self.modifyFacSection = QLineEdit(self)
         self.modifyFacSection.move(80, 125)
+
+        #Remove Faculty Button
+        self.remove_Faculty_Course = QPushButton(self)
+        self.remove_Faculty_Course.setText("Remove")
+        self.remove_Faculty_Course.resize(120, 30)
+        self.remove_Faculty_Course.move(10, 175)
+
+
+        #Cancel Faculty Button
+        self.cancel_Action = QPushButton(self)
+        self.cancel_Action.setText("Cancel")
+        self.cancel_Action.resize(120,30)
+        self.cancel_Action.move(175, 175)
 
 
 
