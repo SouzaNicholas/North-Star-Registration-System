@@ -723,19 +723,21 @@ class MainWindow(QMainWindow):
 
     def setup_ui(self):
         self.setWindowTitle("Main Database Window")
-        self.setGeometry(30, 30, 500, 500)
+        self.setGeometry(30, 30, 475, 250)
 
         # student Id field
-        self.studentID_Label.setText("            Enter ID:")
-        self.studentID_Label.resize(700, 125)
-        self.studentID.move(30, 80)
-        self.studentID.resize(150, 30)
+        self.studentID_Label.setText("ID:")
+        self.studentID_Label.move(30, 80)
+        self.studentID_Label.resize(75, 30)
+        self.studentID.move(100, 80)
+        self.studentID.resize(250, 30)
 
         # student name field
-        self.studentName_label.setText("          Enter name:")
-        self.studentName_label.resize(700, 270)
-        self.studentName.move(30, 150)
-        self.studentName.resize(150, 30)
+        self.studentName_label.setText("Name:")
+        self.studentName_label.move(30, 120)
+        self.studentName_label.resize(75, 30)
+        self.studentName.move(100, 120)
+        self.studentName.resize(250, 30)
 
         # will show our add button inside Main Window
         self.add_button.resize(70, 30)
@@ -762,9 +764,20 @@ class MainWindow(QMainWindow):
         self.box.addItem("Course")
         self.box.addItem("Faculty")
         self.box.addItem("Section")
+        self.box.currentIndexChanged.connect(self.update_labels)
 
         # show on the display
         self.show()
+
+    # Changes main window labels to match the required data for the
+    # newly selected record type.
+    def update_labels(self):
+        if self.box.currentText() == "Student" or self.box.currentText() == "Faculty":
+            self.studentID_Label.setText("ID:")
+            self.studentName_label.setText("Name:")
+        elif self.box.currentText() == "Course" or self.box.currentText() == "Section":
+            self.studentID_Label.setText("Course ID:")
+            self.studentName_label.setText("Section ID:")
 
     def done_exit(self):
         choice = QMessageBox.question(self, 'Extract!', "Are you sure ?",
@@ -788,9 +801,14 @@ class MainWindow(QMainWindow):
         elif record_type == "Faculty":
             record = obj.Faculty([self.studentID.text(), self.studentName.text()])
         elif record_type == "Course":
-            record = obj.Course([self.studentID.text(), self.studentName.text()])
+            record = obj.Course([self.studentID.text()])
         elif record_type == "Section":
-            record = obj.Section([self.studentID.text(), self.studentName.text()])
+            course_id = self.studentID.text()
+            section_id = self.studentName.text()
+            parts = course_id.split("-")
+            course_section_id = parts[0] + parts[1] + "-" + section_id
+            record = obj.Section([course_section_id])
+
         self.lookup = LookupWindow(record)
         self.lookup.show()
 

@@ -73,6 +73,10 @@ class Student:
         try:
             cursor.execute("""DELETE FROM Enrollment WHERE StudentID = (?) AND COURSE_SECTIONID = (?)""",
                            (self.ID, course_section_ID))
+            if not self.check_flags(cursor):
+                flag = 0
+                cursor.execute("""UPDATE Enrollment SET Flag = (?) WHERE StudentID = (?)""",
+                               (flag, self.ID, course_section_ID))
         except Exception as e:
             print("Could not remove course")
         conn.commit()
