@@ -127,6 +127,8 @@ class ReviewWindow(QMainWindow):
 class ModifyWindow(QMainWindow):
     def __init__(self, record):
         super().__init__()
+        self.record = record
+
         self.setWindowTitle("Modify window")
         self.setGeometry(20, 20, 300, 300)
 
@@ -151,7 +153,7 @@ class ModifyWindow(QMainWindow):
         self.update_button.setText("Update")
         self.update_button.resize(100, 30)
         self.update_button.move(20, 250)
-        self.update_button.clicked.connect(self.done_exit)
+        self.update_button.clicked.connect(self.finalize)
 
         #Done_Button
         self.done_button = QPushButton(self)
@@ -159,6 +161,13 @@ class ModifyWindow(QMainWindow):
         self.done_button.resize(70, 30)
         self.done_button.move(230, 250)
         self.done_button.clicked.connect(self.done_exit)
+
+    def finalize(self):
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        name = self.modifyName.text()
+        # Pulls the data entered into the name field to update the record's information
+        self.record.modify(name, curs, conn)
 
     def done_exit(self):
         choice = QMessageBox.question(self, 'Extract!', "Are you sure ?",
@@ -370,11 +379,6 @@ class LookupWindow(QMainWindow):
         self.modify_student.resize(150, 30)
         self.modify_student.move(20,300)
         self.modify_student.clicked.connect(self.modifyWindow)
-
-        # after clicking modify button
-
-
-
 
         # student Remove Student Button
         self.remove_record_button.setText("Remove Student")
@@ -639,7 +643,7 @@ class LookupWindow(QMainWindow):
 
     #modify Window
     def modifyWindow(self):
-            self.open_newWindow = ModifyWindow()
+            self.open_newWindow = ModifyWindow(self.record)
             self.open_newWindow.show()
 
     # Removes the supplied record from the database, if possible
@@ -770,26 +774,6 @@ class MainWindow(QMainWindow):
             self.close()
         else:
             pass
-
-    def add_button_connection(self):
-        # connection with the enrolment table
-        # the joint
-        table = 'enrollment'
-        # self.StudentID.text() will  get the string out the text box and store it into the studentID
-        studentID = self.studentID.text()
-        # this method will check if the studentID exist and it will return a boolean value either 0 or one
-        query = f"""SELECT EXISTS(SELECT 1 FROM Enrollment WHERE studentID ='{studentID}')"""
-        flag = self.cursor.execute(query).fetchall()[0][0]
-        if flag == 1:
-            query = f"""SELECT Enrollment.studentID, S.Name, c.Name, sectionID, flag FROM
-                   Enrollment INNER JOIN Student S on S.studentID = Enrollment.studentID
-                   INNER JOIN Section sec on sec.sectionID= sectionID
-                   INNER JOIN course c on sec.courseID= c.courseID WHERE Enrollment.studentID= '{studentID}'"""
-            self.cursor.execute(query)
-            fence = pd.DataFrame.from_records(self.cursor.fetchall())
-            print(fence)
-        else:
-            self.id_error.exec()
 
     # OnClick method for the lookup button
     # Pulls record type from the dropdown, then creates

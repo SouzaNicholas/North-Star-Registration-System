@@ -173,12 +173,16 @@ class Faculty:
     # Removes a faculty member from a course by changing the listed instructor
     # to a default "No Faculty" entry.
     def remove_course(self, course_section_ID: str, cursor: sql.Cursor, conn: sql.Connection):
-        try:
-            cursor.execute("""UPDATE Section SET FacultyID=(?) WHERE Course_SectionID=(?)""",
-                           ("00000000", course_section_ID))
-        except Exception as e:
-            # Display message in GUI along the lines of "Unexpected error occured. Try again."
-            print("Failed to remove faculty from course for:", self.ID)
+        cursor.execute("""SELECT * FROM Section WHERE FacultyID = (?) 
+                       AND Course_SectionID = (?)""", (self.ID, course_section_ID))
+        sections = cursor.fetchall()
+        if len(sections) > 0:
+            try:
+                cursor.execute("""UPDATE Section SET FacultyID=(?) WHERE Course_SectionID=(?)""",
+                               ("00000000", course_section_ID))
+            except Exception as e:
+                # Display message in GUI along the lines of "Unexpected error occured. Try again."
+                print("Failed to remove faculty from course for:", self.ID)
         conn.commit()
 
 
