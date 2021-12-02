@@ -243,14 +243,14 @@ class Section:
         # Therefore, the parameters passed in must have the
         # rest of the information a new record would need
         if record is not None:
-            self.course_section_ID = record[0]
+            self.ID = record[0]
             self.course_ID = record[1]
             self.faculty_ID = record[2]
             self.section_ID = record[3]
             self.capacity = record[4]
             self.semester = record[5]
         else:
-            self.course_section_ID = parameters[0]
+            self.ID = parameters[0]
             self.course_ID = parameters[1]
             self.faculty_ID = parameters[2]
             self.section_ID = parameters[3]
