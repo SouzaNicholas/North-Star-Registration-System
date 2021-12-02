@@ -605,7 +605,12 @@ class LookupWindow(QMainWindow):
         self.section_capacity_label.setText("Capacity:")
         self.section_capacity_label.resize(150, 20)
         self.section_capacity_label.move(20, 250)
-        self.sectionCapacity.setText(str(self.record.capacity))
+
+        # Creates a connection on the spot to capture the number of currently enrolled students in the course.
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        self.sectionCapacity.setText(str(len(self.record.print_class_list(curs))) + " / " + str(self.record.capacity))
+        conn.close()
         self.sectionCapacity.resize(150, 20)
         self.sectionCapacity.move(100, 250)
 

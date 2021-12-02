@@ -323,9 +323,9 @@ class Section:
         else:
             return False
 
-    def print_class_list(self, cursor: sql.Cursor, conn: sql.Connection):
+    def print_class_list(self, cursor: sql.Cursor):
         # get studentID from enrollment if course_sectionID matches
         cursor.execute("""SELECT Enrollment.StudentID, Student.Name FROM Enrollment JOIN Student WHERE 
                               Student.StudentID = Enrollment.StudentID AND Enrollment.Course_SectionID = (?)""",
-                       (self.course_section_ID,))
+                       [self.ID])
         return cursor.fetchall()
