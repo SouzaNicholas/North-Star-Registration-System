@@ -11,7 +11,7 @@ import pandas as pd
 class facWindow(QMainWindow):
     def __init__(self, record):
         super().__init__()
-        self.setWindowTitle("Add Course")
+        self.setWindowTitle("Remove Course")
 
         self.record = record
         self.setGeometry(20, 20, 300, 230)
@@ -51,18 +51,32 @@ class facWindow(QMainWindow):
         self.modifyFacSection = QLineEdit(self)
         self.modifyFacSection.move(80, 125)
 
+
         #Remove Faculty Button
         self.remove_Faculty_Course = QPushButton(self)
         self.remove_Faculty_Course.setText("Remove")
         self.remove_Faculty_Course.resize(120, 30)
         self.remove_Faculty_Course.move(10, 175)
+        self.remove_Faculty_Course.clicked.connect(self.finalize)
+
 
         #Cancel Faculty Button
         self.cancel_Action = QPushButton(self)
         self.cancel_Action.setText("Cancel")
         self.cancel_Action.resize(120,30)
         self.cancel_Action.move(175, 175)
-        self.cancel.clicked.connect(self.done_exit)
+
+    def finalize(self):
+
+        sectionID = self.modifyFacSection.text()
+        courseID = self.modifyCourseId.text()
+
+        parts=courseID.split("-")
+        course_section_ID = parts[0] + parts[1] + "-" +sectionID
+
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        self.record.remove_course(course_section_ID, curs, conn)
 
 
 class ReviewWindow(QMainWindow):
@@ -165,6 +179,9 @@ class CourseAddWindow(QMainWindow):
         self.semester_label = QLabel(self)
         self.semester_field = QLineEdit(self)
 
+        self.done_button = QPushButton(self)
+        self.cancel_button = QPushButton(self)
+
         self.setup_ui()
 
     def setup_ui(self):
@@ -173,37 +190,37 @@ class CourseAddWindow(QMainWindow):
         self.id_label.setText("ID:")
         self.id_label.resize(100, 30)
         self.id_label.move(20, 10)
-        self.id_field.resize(150, 20)
+        self.id_field.resize(250, 20)
         self.id_field.move(100, 10)
 
         self.description_label.setText("Description:")
         self.description_label.resize(100, 30)
         self.description_label.move(20, 40)
-        self.description_field.resize(150, 20)
+        self.description_field.resize(250, 20)
         self.description_field.move(100, 40)
 
         self.credits_label.setText("Credits:")
         self.credits_label.resize(100, 30)
         self.credits_label.move(20, 70)
-        self.credits_field.resize(150, 20)
+        self.credits_field.resize(250, 20)
         self.credits_field.move(100, 70)
 
         self.section_label.setText("Section:")
         self.section_label.resize(100, 30)
         self.section_label.move(20, 100)
-        self.section_field.resize(150, 20)
+        self.section_field.resize(250, 20)
         self.section_field.move(100, 100)
 
         self.capacity_label.setText("Capacity:")
         self.capacity_label.resize(100, 30)
         self.capacity_label.move(20, 130)
-        self.capacity_field.resize(150, 20)
+        self.capacity_field.resize(250, 20)
         self.capacity_field.move(100, 130)
 
         self.semester_label.setText("Semester:")
         self.semester_label.resize(100, 30)
         self.semester_label.move(20, 160)
-        self.semester_field.resize(150, 20)
+        self.semester_field.resize(250, 20)
         self.semester_field.move(100, 160)
 
         self.done_button.setText("Done")
@@ -313,8 +330,10 @@ class LookupWindow(QMainWindow):
         self.student_credits_label.setText("Credits:")
         self.student_credits_label.resize(150,20)
         self.student_credits_label.move(20,150)
+        self.studentCredits.setText(str(self.record.credits))
         self.studentCredits.resize(150,20)
         self.studentCredits.move(75,150)
+
 
         # student AddButton
         self.add_course.setText("Add Course")
@@ -416,7 +435,7 @@ class LookupWindow(QMainWindow):
         self.remove_course.setText("Remove Course")
         self.remove_course.resize(150,30)
         self.remove_course.move(20,150)
-
+        self.remove_course.clicked.connect(self.facWin)
         # faculty RemoveFacultyButton
         self.remove_faculty.setText("Remove Faculty")
         self.remove_faculty.resize(150,30)
@@ -516,7 +535,7 @@ class LookupWindow(QMainWindow):
 
 
     def setup_section_ui(self):
-        course = obj.Course([self.record.course_ID])
+        course = obj.Course(self.record.course_ID)
         self.setWindowTitle("Course Section Lookup")
 
         # SectionId
@@ -630,7 +649,8 @@ class LookupWindow(QMainWindow):
         choice = QMessageBox.question(self, 'Extract!', "Are you sure ?",
                                       QMessageBox.Yes | QMessageBox.No)
         if choice == QMessageBox.Yes:
-            self.close()
+            print("Ok have a good day!")
+            sys.exit()
         else:
             pass
 
@@ -749,8 +769,6 @@ class MainWindow(QMainWindow):
     # the corresponding type of record by pulling its
     # ID from the ID entry. That record is then passed
     # to a new lookup menu object.
-
-
     def build_lookup(self):
         record_type = self.box.currentText()
         record = None
@@ -785,12 +803,4 @@ class MainWindow(QMainWindow):
             self.course_add = CourseAddWindow()
             self.course_add.show()
         conn.close()
-
-
-
-
-
-
-
-
 
