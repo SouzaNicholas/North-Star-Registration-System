@@ -13,7 +13,7 @@ class Student:
         # If not, we assume this is a new record.
         # Therefore, the parameters passed in must have the
         # rest of the information a new record would need
-        if type(record) is not None:
+        if record is not None:
             self.ID = record[0]
             self.name = record[1]
         else:
@@ -109,7 +109,7 @@ class Faculty:
         # If not, we assume this is a new record.
         # Therefore, the parameters passed in must have the
         # rest of the information a new record would need
-        if type(record) is not None:
+        if record is not None:
             self.ID = record[0]
             self.name = record[1]
         else:
@@ -187,7 +187,7 @@ class Course:
         # If not, we assume this is a new record.
         # Therefore, the parameters passed in must have the
         # rest of the information a new record would need
-        if type(record) is not None:
+        if record is not None:
             self.course_ID = record[0]
             self.name = record[1]
             self.credits = record[2]
@@ -237,7 +237,7 @@ class Section:
         # If not, we assume this is a new record.
         # Therefore, the parameters passed in must have the
         # rest of the information a new record would need
-        if type(record) is not None:
+        if record is not None:
             self.course_section_ID = record[0]
             self.course_ID = record[1]
             self.faculty_ID = record[2]
