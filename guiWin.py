@@ -390,8 +390,7 @@ class LookupWindow(QMainWindow):
         choice = QMessageBox.question(self, 'Extract!', "Are you sure ?",
                                       QMessageBox.Yes | QMessageBox.No)
         if choice == QMessageBox.Yes:
-            print("Ok have a good day!")
-            sys.exit()
+            self.close()
         else:
             pass
 
@@ -481,7 +480,7 @@ class MainWindow(QMainWindow):
                               QMessageBox.Yes | QMessageBox.No)
         if choice == QMessageBox.Yes:
          print("Ok have a good day!")
-         sys.exit()
+         self.close()
         else:
             pass
 
