@@ -62,6 +62,7 @@ class facWindow(QMainWindow):
         self.cancel_Action.setText("Cancel")
         self.cancel_Action.resize(120,30)
         self.cancel_Action.move(175, 175)
+        self.cancel.clicked.connect(self.done_exit)
 
 
 class ReviewWindow(QMainWindow):
@@ -92,6 +93,8 @@ class ReviewWindow(QMainWindow):
         self.cancel.setText("Cancel")
         self.cancel.resize(120,30)
         self.cancel.move(257,350)
+        self.cancel.clicked.connect(self.done_exit)
+
 
 
 class ModifyWindow(QMainWindow):
@@ -356,6 +359,8 @@ class LookupWindow(QMainWindow):
         self.cancel.setText("Cancel")
         self.cancel.resize(100, 30)
         self.cancel.move(270, 450)
+        self.cancel.clicked.connect(self.done_exit)
+
 
     def facWin(self):
         self.open_newWindow = facWindow(self.record)
@@ -437,7 +442,7 @@ class LookupWindow(QMainWindow):
 
      #modify Window
     def modifyWindow(self):
-            self.open_newWindow = ModifyWindow()
+            self.open_newWindow = ModifyWindow(self)
             self.open_newWindow.show()
 
 
