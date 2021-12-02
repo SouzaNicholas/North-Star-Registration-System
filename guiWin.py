@@ -11,10 +11,10 @@ import pandas as pd
 
 # print section Registration for student
 class PrintSectionWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, record):
         super().__init__()
 
-        #self.record = record
+        self.record = record
         self.setWindowTitle("Print Semester Registration")
         self.setGeometry(30, 30, 400, 400)
 
@@ -24,11 +24,30 @@ class PrintSectionWindow(QMainWindow):
         self.enrolled_label.resize(200, 30)
         self.enrolled_label.move(10, 10)
 
-        # lookup Button
-        self.loop_up_button = QPushButton(self)
-        self.loop_up_button.setText("Lookup")
-        self.loop_up_button.move(250, 50)
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        students = self.record.print_class_list(curs)
+        self.enrolled = []
 
+        self.names = []
+        self.lookup_buttons = []
+
+        x = 10
+        y = 50
+        for i in range(len(students)):
+            self.names.append(QLabel(self))
+            nextButton = QPushButton(self)
+
+            self.names[i].setText(students[i][1])
+            nextButton.setText("Lookup")
+            self.enrolled.append(obj.Student([students[i][0]]))
+            nextButton.clicked.connect(lambda:self.build_lookup(nextButton))
+
+            self.lookup_buttons.append(nextButton)
+
+            self.names[i].move(x, y)
+            self.lookup_buttons[i].move(x + 280, y)
+            y += 30
 
         # Remove Flag Button
         self.remove_flag_button =QPushButton(self)
@@ -40,6 +59,21 @@ class PrintSectionWindow(QMainWindow):
         self.cancel_button = QPushButton(self)
         self.cancel_button.setText("Cancel")
         self.cancel_button.move(300,350)
+        self.cancel_button.clicked.connect(self.exit)
+
+    def remove_flag(self):
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        self.record.approve_flags(curs, conn)
+        conn.close()
+
+    def build_lookup(self, button):
+        index = self.lookup_buttons.index(button)
+        self.lookup = LookupWindow(self.enrolled[index])
+        self.lookup.show()
+
+    def exit(self):
+        self.close()
 
 class courseEnrollWindow(QMainWindow):
     def __init__(self, record, action):
@@ -125,51 +159,117 @@ class courseEnrollWindow(QMainWindow):
         self.close()
 
 class ReviewWindow(QMainWindow):
-    def __init__(self,record):
-
+    def __init__(self, record):
         super().__init__()
         self.record = record
         self.setWindowTitle("Registration Info")
-        self.setGeometry(30,30,400,400)
+        self.setGeometry(30,30,500,400)
 
 
        # setting Id label
         self.id = QLabel(self)
-        self.id_label= QLabel(self.record.ID)
+        self.id_label = QLabel(self)
         self.id_label.setText("ID")
-        self.id_label.move(2,10)
-        self.id.setText(self.record.name)
+        self.id_label.move(2, 10)
+        self.id.setText(self.record.ID)
         self.id.move(50, 10)
 
         #setting Name Label
         self.name_label = QLabel(self)
         self.name_label.setText("Name")
-        self.name_label.move(2,30)
+        self.name_label.move(2, 30)
         self.name = QLabel(self)
         self.name.setText(self.record.name)
         self.name.move(50, 30)
 
+        # create lists of each data point for student courses to display info
+        self.ids = [QLabel(self)]
+        self.descriptions = [QLabel(self)]
+        self.sections = [QLabel(self)]
+        self.capacities = [QLabel(self)]
+        self.credits = [QLabel(self)]
+        self.flags = [QLabel(self)]
 
+        # populate label lists with headers
+        self.ids[0].setText("ID")
+        self.descriptions[0].setText("Description")
+        self.sections[0].setText("Section")
+        self.capacities[0].setText("Capacity")
+        self.credits[0].setText("Credits")
+        self.flags[0].setText("Flag")
+
+        height = 75
+        # Move label headers to appropriate location
+        self.ids[0].move(5, height)
+        self.descriptions[0].move(100, height)
+        self.sections[0].move(325, height)
+        self.capacities[0].move(375, height)
+        self.credits[0].move(425, height)
+        self.flags[0].move(475, height)
+
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        self.db_sections = self.record.print_registration(curs)
+
+        for i in range(len(self.db_sections)):
+            self.ids.append(QLabel(self))
+            self.descriptions.append(QLabel(self))
+            self.sections.append(QLabel(self))
+            self.capacities.append(QLabel(self))
+            self.credits.append(QLabel(self))
+            self.flags.append(QLabel(self))
+
+            # populate data
+            self.ids[i+1].setText(self.db_sections[i][0])
+            self.descriptions[i+1].setText(self.db_sections[i][1])
+            self.sections[i+1].setText(str(self.db_sections[i][2]))
+            self.capacities[i+1].setText(str(self.db_sections[i][3]))
+            self.credits[i+1].setText(str(self.db_sections[i][4]))
+            self.flags[i+1].setText(str(self.db_sections[i][5]))
+
+            height += 25
+            # Move data to appropriate location
+            self.ids[i+1].move(5, height)
+            self.descriptions[i+1].move(100, height)
+            self.descriptions[i+1].resize(225, 30) # Specifically resize this field as it's long and gets truncated
+            self.sections[i+1].move(325, height)
+            self.capacities[i+1].move(375, height)
+            self.credits[i+1].move(425, height)
+            self.flags[i+1].move(475, height)
 
         # Remove Flag Button
         self.removeflag = QPushButton(self)
         self.removeflag.setText("Remove Flag")
         self.removeflag.resize(120, 30)
         self.removeflag.move(10, 350)
+        self.removeflag.clicked.connect(self.remove_flag)
 
         # Remove Course Button
         self.removecourse = QPushButton(self)
         self.removecourse.setText("Remove Course")
-        self.removecourse.resize(120,30)
-        self.removecourse.move(130,350)
+        self.removecourse.resize(120, 30)
+        self.removecourse.move(130, 350)
+        self.removecourse.clicked.connect(self.remove_course)
 
         # Cancel Button
         self.cancel = QPushButton(self)
         self.cancel.setText("Cancel")
-        self.cancel.resize(120,30)
-        self.cancel.move(257,350)
-        self.cancel.clicked.connect(self.done_exit)
+        self.cancel.resize(120, 30)
+        self.cancel.move(375, 350)
+        self.cancel.clicked.connect(self.exit)
 
+    def remove_flag(self):
+        conn = sql.connect("NorthStarRegistrationDB.db")
+        curs = conn.cursor()
+        self.record.approve_flags(curs, conn)
+        conn.close()
+
+    def remove_course(self):
+        self.rem_crs_win = courseEnrollWindow(self.record, False)
+        self.rem_crs_win.show()
+
+    def exit(self):
+        self.close()
 
 
 class ModifyWindow(QMainWindow):
@@ -455,7 +555,7 @@ class LookupWindow(QMainWindow):
 
    # print Semester Registration
     def printSection(self):
-        self.open_newWindow = PrintSectionWindow()
+        self.open_newWindow = PrintSectionWindow(self.record)
         self.open_newWindow.show()
         # Review Window
     def reviewWindow(self):
@@ -545,8 +645,6 @@ class LookupWindow(QMainWindow):
         # courseButton
         self.done = QPushButton(self)
         self.cancel = QPushButton(self)
-        self.print_semester = QPushButton(self)
-        self.print_semester.clicked.connect(self.reviewWindow)
 
         self.setGeometry(20, 20, 400, 400)
         # courseId
@@ -575,12 +673,6 @@ class LookupWindow(QMainWindow):
         # course RemoveCourseButton
         self.remove_record_button.setText("Remove Course")
         self.remove_record_button.move(20, 150)
-
-        # Print Registration
-
-        self.print_semester.setText("Print Semester Registration")
-        self.print_semester.resize(300, 30)
-        self.print_semester.move(20, 300)
 
         # course doneButton
         self.done.setText("Done")

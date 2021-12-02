@@ -18,6 +18,9 @@ class Student:
         elif len(parameters) >= 2:
             self.ID = parameters[0]
             self.name = parameters[1]
+        else:
+            self.ID = ""
+            self.name = ""
         self.credits = self.credits(curs)
         conn.close()
 
@@ -92,6 +95,17 @@ class Student:
             cred += i[0]
         return cred
 
+    def approve_flags(self, cursor: sql.Cursor, conn: sql.Connection):
+        # Flag = 1 indicates a credit flag. If that's the case for an
+        # enrollment record, set it to 0. Flag = 3 indicates a credit
+        # flag and a capacity flag. In that case, change it to just be
+        # a capacity flag.
+        cursor.execute("""UPDATE Enrollment SET Flag = 0 WHERE StudentID = (?)
+                       AND Flag = 1""", [self.ID])
+        cursor.execute("""UPDATE Enrollment SET Flag = 2 WHERE StudentID = (?)
+                       AND Flag = 3""", [self.ID])
+        conn.commit()
+
     def check_flags(self, cursor: sql.Cursor) -> bool:
         if self.credits(cursor) > 12:
             return True
@@ -99,7 +113,8 @@ class Student:
             return False
 
     def print_registration(self, cursor: sql.Cursor):
-        cursor.execute("""SELECT Section.Course_SectionID, Course.Name, Course.Credits FROM Course JOIN Section, Student, Enrollment
+        cursor.execute("""SELECT Section.Course_SectionID, Course.Name, Section.SectionID,
+                       Course.Credits, Section.Capacity, Enrollment.Flag FROM Course JOIN Section, Student, Enrollment
                         WHERE Section.Course_SectionID = Enrollment.Course_SectionID
                         AND Course.CourseID = Section.CourseID
                         AND Student.StudentID = Enrollment.StudentID
@@ -127,6 +142,9 @@ class Faculty:
         elif len(parameters) >= 2:
             self.ID = parameters[0]
             self.name = parameters[1]
+        else:
+            self.ID = ""
+            self.name = ""
         conn.close()
 
     # Adds the faculty record to the database.
@@ -212,6 +230,10 @@ class Course:
             self.course_ID = parameters[0]
             self.name = parameters[1]
             self.credits = parameters[2]
+        else:
+            self.course_ID = ""
+            self.name = ""
+            self.credits = 0
         conn.close()
         # self.id = id
         # self.name = name
@@ -269,6 +291,13 @@ class Section:
             self.section_ID = parameters[3]
             self.capacity = parameters[4]
             self.semester = parameters[5]
+        else:
+            self.ID = ""
+            self.course_ID = ""
+            self.faculty_ID = ""
+            self.section_ID = ""
+            self.capacity = 0
+            self.semester = ""
         conn.close()
         # self.course_section_ID = course_section_ID
         # self.course_ID = course_ID
@@ -322,6 +351,17 @@ class Section:
             return True
         else:
             return False
+
+    def approve_flags(self, cursor: sql.Cursor, conn: sql.Connection):
+        # Flag = 2 indicates a capacity flag. If that's the case for an
+        # enrollment record, set it to 0. Flag = 3 indicates a credit
+        # flag and a capacity flag. In that case, change it to just be
+        # a credit flag.
+        cursor.execute("""UPDATE Enrollment SET Flag = 0 WHERE Course_SectionID = (?)
+                       AND Flag = 2""", [self.ID])
+        cursor.execute("""UPDATE Enrollment SET Flag = 1 WHERE Course_SectionID = (?)
+                       AND Flag = 3""", [self.ID])
+        conn.commit()
 
     def print_class_list(self, cursor: sql.Cursor):
         # get studentID from enrollment if course_sectionID matches
